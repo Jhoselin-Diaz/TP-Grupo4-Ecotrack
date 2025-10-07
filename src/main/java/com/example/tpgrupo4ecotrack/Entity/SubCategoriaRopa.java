@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -22,7 +23,7 @@ public class SubCategoriaRopa {
     private Float cantidadKg;
     private Float emisionesKgCO2_R;
     private Boolean enviadoResultadoR;
-    private Date fechaRegistro;
+    private LocalDateTime fechaRegistro;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")

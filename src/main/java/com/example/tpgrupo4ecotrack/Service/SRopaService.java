@@ -1,35 +1,38 @@
 package com.example.tpgrupo4ecotrack.Service;
 
-import com.example.tpgrupo4ecotrack.DTO.AlimentoDTO;
-import com.example.tpgrupo4ecotrack.DTO.ListaAlimentoPorUsuarioDTO;
 import com.example.tpgrupo4ecotrack.DTO.ListaRopaDTO;
-import com.example.tpgrupo4ecotrack.DTO.RopaDTO;
+import com.example.tpgrupo4ecotrack.DTO.SRopaDTO;
 import com.example.tpgrupo4ecotrack.Entity.*;
-import com.example.tpgrupo4ecotrack.Repository.RopaRepository;
+import com.example.tpgrupo4ecotrack.Repository.CategoriaRepository;
+import com.example.tpgrupo4ecotrack.Repository.FactorEmisionRepository;
+import com.example.tpgrupo4ecotrack.Repository.SRopaRepository;
 import com.example.tpgrupo4ecotrack.Repository.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @Slf4j
-public class RopaService {
+public class SRopaService {
 
-    private final RopaRepository ropaRepository;
+    private final SRopaRepository SropaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final FactorEmisionRepository factorEmisionRepository;
+    private final CategoriaRepository categoriaRepository;
 
-    public RopaService(RopaRepository ropaRepository, UsuarioRepository usuarioRepository) {
+    public SRopaService(SRopaRepository SropaRepository, UsuarioRepository usuarioRepository, FactorEmisionRepository factorEmisionRepository, CategoriaRepository categoriaRepository) {
 
-        this.ropaRepository = ropaRepository;
+        this.SropaRepository = SropaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.factorEmisionRepository = factorEmisionRepository;
+        this.categoriaRepository = categoriaRepository;
     }
 
 
-    public RopaDTO insertar(RopaDTO dto) {
+    public SRopaDTO insertar(SRopaDTO dto) {
         log.info("Insertar Ropa: {}", dto.getTipoPrenda());
         ModelMapper modelMapper = new ModelMapper();
         SubCategoriaRopa ropa = modelMapper.map(dto, SubCategoriaRopa.class);
@@ -53,15 +56,15 @@ public class RopaService {
             ropa.setFactor(factorEmision);
         }
 
-        ropa = ropaRepository.save(ropa);
-        return modelMapper.map(ropa, RopaDTO.class);
+        ropa = SropaRepository.save(ropa);
+        return modelMapper.map(ropa, SRopaDTO.class);
     }
 
     public List<ListaRopaDTO> listarPorUsuario(String username) {
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        List<SubCategoriaRopa> lista = ropaRepository.findByUsuario_IdUsuario(usuario.getIdUsuario());
+        List<SubCategoriaRopa> lista = SropaRepository.findByUsuario_IdUsuario(usuario.getIdUsuario());
         ModelMapper modelMapper = new ModelMapper();
 
         return lista.stream()
@@ -74,12 +77,12 @@ public class RopaService {
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        return ropaRepository.sumEmisionesByUsuario(usuario.getIdUsuario());
+        return SropaRepository.sumEmisionesByUsuario(usuario.getIdUsuario());
     }
 
     public String eliminar(Long id) {
         log.warn("Eliminando prenda con ID: {}", id);
-        ropaRepository.deleteById(id);
+        SropaRepository.deleteById(id);
         return "Registro eliminado";
     }
 }

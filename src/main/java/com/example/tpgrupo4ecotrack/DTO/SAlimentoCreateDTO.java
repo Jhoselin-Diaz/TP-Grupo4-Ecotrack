@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AlimentoCreateDTO {
+public class SAlimentoCreateDTO {
        private String nombreAlimento;
        private Float cantidadKg;
 }

@@ -4,22 +4,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AutobusDTO {
+public class SAutobusDTO {
     private Long idAutobus;
-    private Double autobusKm;
-    private Double autocarKm;
-    private Double trenNacionalKm;
-    private Double tranviaKm;
-    private Double metroKm;
-    private Double taxiKm;
-    private Double emisionesKgCO2_A;
+    private Float autobusKm;
+    private Float autocarKm;
+    private Float trenNacionalKm;
+    private Float tranviaKm;
+    private Float metroKm;
+    private Float taxiKm;
+    private Float emisionesKgCO2_A;
     private Boolean enviadoResultadoA;
-    private Date fechaRegistro;
+    private LocalDateTime fechaRegistro;
     private Long categoriaid;
     private Long factorid;
     private Long usuarioid;

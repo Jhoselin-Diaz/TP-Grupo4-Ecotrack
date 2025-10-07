@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 
@@ -19,13 +20,13 @@ public class SubCategoriaCoche {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCoche;
 
-    private int numeroCoches;
-    private float kilometrajeTotal;
+    private Integer numeroCoches;
+    private Float kilometrajeTotal;
     private String marca;
     private String tipoGasolina;
-    private float emisionesKgCO2_C;
-    private boolean enviadoResultadoC;
-    private Date fechaRegistro;
+    private Float emisionesKgCO2_C;
+    private Boolean enviadoResultadoC;
+    private LocalDateTime fechaRegistro;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")

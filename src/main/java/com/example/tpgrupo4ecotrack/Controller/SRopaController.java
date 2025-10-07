@@ -1,9 +1,7 @@
 package com.example.tpgrupo4ecotrack.Controller;
 
 import com.example.tpgrupo4ecotrack.DTO.*;
-import com.example.tpgrupo4ecotrack.Entity.SubCategoriaAutobus;
-import com.example.tpgrupo4ecotrack.Entity.SubCategoriaRopa;
-import com.example.tpgrupo4ecotrack.Service.RopaService;
+import com.example.tpgrupo4ecotrack.Service.SRopaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,33 +11,33 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/ropas")
-public class RopaController {
+public class SRopaController {
 
-    private final RopaService ropaService;
-    public RopaController(RopaService ropaService) {
-        this.ropaService = ropaService;
+    private final SRopaService SRopaService;
+    public SRopaController(SRopaService SRopaService) {
+        this.SRopaService = SRopaService;
     }
 
     @GetMapping("/MisRopa")
     public ResponseEntity<List<ListaRopaDTO>> listarMisRopa(Authentication authentication) {
         String username = authentication.getName(); // extrae del token JWT
-        List<ListaRopaDTO> lista = ropaService.listarPorUsuario(username);
+        List<ListaRopaDTO> lista = SRopaService.listarPorUsuario(username);
         return ResponseEntity.ok(lista);
     }
 
     @PostMapping("/inserta")
-    public ResponseEntity<RopaDTO> insertar(@RequestBody RopaDTO dto) {
-        return new ResponseEntity<>(ropaService.insertar(dto), HttpStatus.CREATED);
+    public ResponseEntity<SRopaDTO> insertar(@RequestBody SRopaDTO dto) {
+        return new ResponseEntity<>(SRopaService.insertar(dto), HttpStatus.CREATED);
     }
 
     @GetMapping("/total")
     public ResponseEntity<Float> totalEmisiones() {
-        Float total = ropaService.calcularTotalEmisionesDelUsuario();
+        Float total = SRopaService.calcularTotalEmisionesDelUsuario();
         return ResponseEntity.ok(total);
     }
 
     @DeleteMapping("/elimina/{id}")
     public String eliminar(@PathVariable Long id) {
-        return ropaService.eliminar(id);
+        return SRopaService.eliminar(id);
     }
 }

@@ -4,18 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ElectrodomesticoDTO {
+public class SElectrodomesticoDTO {
     private Long idElectrodomestico;
     private String tipoElectrodomestico;
-    private Double consumoKWh;
-    private Double emisionesKgCO2_E;
+    private Float consumoKWh;
+    private Float emisionesKgCO2_E;
     private Boolean enviadoResultadoE;
-    private Date fechaRegistro;
+    private LocalDateTime fechaRegistro;
     private Long categoria;
     private Long factor;
     private Long usuario;

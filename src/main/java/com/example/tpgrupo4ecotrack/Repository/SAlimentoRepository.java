@@ -1,7 +1,6 @@
 package com.example.tpgrupo4ecotrack.Repository;
 
 import com.example.tpgrupo4ecotrack.Entity.SubCategoriaAlimento;
-import com.example.tpgrupo4ecotrack.Entity.SubCategoriaServicioVivienda;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,19 +8,20 @@ import org.springframework.data.repository.query.Param;
 import java.util.Date;
 import java.util.List;
 
-public interface ServicioViviendaRepository extends JpaRepository<SubCategoriaServicioVivienda, Long> {
-    List<SubCategoriaServicioVivienda> findByUsuario_IdUsuario(Long usuarioId);
+public interface SAlimentoRepository extends JpaRepository<SubCategoriaAlimento, Long> {
 
-    @Query("SELECT SUM(a.emisionesKgCO2_S) " +
-            "FROM SubCategoriaServicioVivienda a WHERE a.usuario.idUsuario = :usuarioId")
-    Float sumEmisionesByUsuario(
-            @Param("usuarioId") Long usuarioId);
+    List<SubCategoriaAlimento> findByUsuario_IdUsuario(Long usuarioId);
 
-    @Query("SELECT a FROM SubCategoriaServicioVivienda a " +
+    @Query("SELECT SUM(a.emisionesKgCO2_AL) " +
+            "FROM SubCategoriaAlimento a WHERE a.usuario.idUsuario = :usuarioId")
+    Float sumEmisionesByUsuario(@Param("usuarioId") Long usuarioId);
+
+    @Query("SELECT a FROM SubCategoriaAlimento a " +
             "WHERE a.usuario.idUsuario = :usuarioId " +
             "AND a.fechaRegistro BETWEEN :fechaInicio AND :fechaFin")
-    List<SubCategoriaServicioVivienda> findByUsuarioAndFecha(
+    List<SubCategoriaAlimento> findByUsuarioAndFecha(
             @Param("usuarioId") Long usuarioId,
             @Param("fechaInicio") Date fechaInicio,
             @Param("fechaFin") Date fechaFin);
 }
+

@@ -1,32 +1,34 @@
 package com.example.tpgrupo4ecotrack.Service;
 
-import com.example.tpgrupo4ecotrack.DTO.AlimentoDTO;
-import com.example.tpgrupo4ecotrack.DTO.AutobusDTO;
+import com.example.tpgrupo4ecotrack.DTO.SAutobusDTO;
 import com.example.tpgrupo4ecotrack.Entity.*;
-import com.example.tpgrupo4ecotrack.Repository.AutobusRepository;
+import com.example.tpgrupo4ecotrack.Repository.CategoriaRepository;
+import com.example.tpgrupo4ecotrack.Repository.FactorEmisionRepository;
+import com.example.tpgrupo4ecotrack.Repository.SAutobusRepository;
 import com.example.tpgrupo4ecotrack.Repository.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @Slf4j
-public class AutobusService {
+public class SAutobusService {
 
-    private final AutobusRepository autobusRepository;
+    private final SAutobusRepository SautobusRepository;
     private final UsuarioRepository usuarioRepository;
+    private final FactorEmisionRepository factorEmisionRepository;
+    private final CategoriaRepository categoriaRepository;
 
-    public AutobusService(AutobusRepository autobusRepository, UsuarioRepository usuarioRepository) {
-        this.autobusRepository = autobusRepository;
+    public SAutobusService(SAutobusRepository SautobusRepository, UsuarioRepository usuarioRepository, FactorEmisionRepository factorEmisionRepository, CategoriaRepository categoriaRepository ) {
+        this.SautobusRepository = SautobusRepository;
         this.usuarioRepository = usuarioRepository;
+        this.factorEmisionRepository = factorEmisionRepository;
+        this.categoriaRepository = categoriaRepository;
     }
 
 
-    public AutobusDTO insertar(AutobusDTO dto) {
+    public SAutobusDTO insertar(SAutobusDTO dto) {
         log.info("Insertar Alimento: {}", dto.getIdAutobus());
         ModelMapper modelMapper = new ModelMapper();
         SubCategoriaAutobus autobus = modelMapper.map(dto, SubCategoriaAutobus.class);
@@ -50,8 +52,8 @@ public class AutobusService {
             autobus.setFactor(factorEmision);
         }
 
-        autobus = autobusRepository.save(autobus);
-        return modelMapper.map(autobus, AutobusDTO.class);
+        autobus = SautobusRepository.save(autobus);
+        return modelMapper.map(autobus, SAutobusDTO.class);
     }
 
     public Float calcularTotalEmisionesDelUsuario() {
@@ -59,12 +61,12 @@ public class AutobusService {
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        return autobusRepository.sumEmisionesByUsuario(usuario.getIdUsuario());
+        return SautobusRepository.sumEmisionesByUsuario(usuario.getIdUsuario());
     }
 
     public String eliminar(Long id) {
         log.warn("Eliminando transporte público con ID: {}", id);
-        autobusRepository.deleteById(id);
+        SautobusRepository.deleteById(id);
         return "Registro eliminado";
     }
 }

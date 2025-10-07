@@ -14,19 +14,19 @@ import java.util.List;
 @Slf4j
 @Service
 public class ConsumoService {
-    private final AlimentoRepository alimentoRepo;
-    private final RopaRepository ropaRepo;
-    private final ElectrodomesticoRepository electroRepo;
-    private final CocheRepository cocheRepo;
-    private final AutobusRepository autobusRepo;
-    private final ServicioViviendaRepository servicioRepo;
+    private final SAlimentoRepository alimentoRepo;
+    private final SRopaRepository ropaRepo;
+    private final SElectrodomesticoRepository electroRepo;
+    private final SCocheRepository cocheRepo;
+    private final SAutobusRepository autobusRepo;
+    private final SServicioViviendaRepository servicioRepo;
 
 
-    public ConsumoService(AlimentoRepository alimentoRepo,
-                          RopaRepository ropaRepo,
-                          ElectrodomesticoRepository electroRepo,
-                          CocheRepository cocheRepo, AutobusRepository autobusRepo,
-                          ServicioViviendaRepository servicioRepo) {
+    public ConsumoService(SAlimentoRepository alimentoRepo,
+                          SRopaRepository ropaRepo,
+                          SElectrodomesticoRepository electroRepo,
+                          SCocheRepository cocheRepo, SAutobusRepository autobusRepo,
+                          SServicioViviendaRepository servicioRepo) {
         this.alimentoRepo = alimentoRepo;
         this.ropaRepo = ropaRepo;
         this.electroRepo = electroRepo;

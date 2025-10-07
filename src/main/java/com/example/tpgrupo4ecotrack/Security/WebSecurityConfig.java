@@ -48,11 +48,11 @@ public class WebSecurityConfig {
                         .requestMatchers("/factores/actualizar/**").hasAuthority("ADMIN")
                         .requestMatchers("/factores/listar/**").hasAuthority("ADMIN")
                         .requestMatchers("/alimentos/inserta").hasAuthority("USER")
-                        .requestMatchers("/alimentos/actualizar/**").hasAuthority("ADMIN")
+                        .requestMatchers("/alimentos/actualizar/**").hasAuthority("USER")
+                        .requestMatchers("/alimentos/listaAdmin").hasAuthority("ADMIN")
                         .requestMatchers("/alimentos/MisAlimentos/**").hasAuthority("USER")
-                        .requestMatchers("/alimentos/listar").hasAuthority("ADMIN")
                         .requestMatchers("/alimentos/MisAlimentos").hasAuthority("USER")
-                        .requestMatchers("/alimentos/eliminar/**").hasAuthority("USER")
+                        .requestMatchers("/alimentos/eliminar/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/alimentos/MiActualizar/**").hasAuthority("USER")
                         .requestMatchers("/alimentos/total").hasAuthority("USER")
                         .requestMatchers("/ropas/inserta").hasAuthority("USER")
@@ -65,8 +65,11 @@ public class WebSecurityConfig {
                         .requestMatchers("/servicios/lista").hasAuthority("USER")
                         .requestMatchers("/servicios/inserta").hasAuthority("USER")
                         .requestMatchers("/coches/inserta").hasAuthority("USER")
-                        .requestMatchers("/coches/MisCoche").hasAuthority("USER")
+                        .requestMatchers("/coches/MisCoches").hasAuthority("USER")
                         .requestMatchers("/coches/elimina/**").hasAuthority("USER")
+                        .requestMatchers("/coches/total").hasAuthority("ADMIN")
+                        .requestMatchers("/coches/registrar").hasAuthority("USER")
+                        .requestMatchers("/coches/actualizar").hasAuthority("USER")
 
                         .anyRequest().authenticated()
                 )
@@ -90,6 +93,7 @@ public class WebSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 }
