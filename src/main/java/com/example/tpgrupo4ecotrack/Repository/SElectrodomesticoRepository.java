@@ -15,8 +15,7 @@ public interface SElectrodomesticoRepository extends JpaRepository<SubCategoriaE
 
     @Query("SELECT SUM(e.emisionesKgCO2_E) FROM SubCategoriaElectrodomestico e " +
             "WHERE e.usuario.idUsuario = :usuarioId")
-    Long getTotalEmisionesByUsuario(
-            @Param("usuarioId") Long usuarioId);
+    Float sumEmisionesByUsuario(@Param("usuarioId") Long usuarioId);
 
     @Query("SELECT a FROM SubCategoriaElectrodomestico a " +
             "WHERE a.usuario.idUsuario = :usuarioId " +
