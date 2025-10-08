@@ -33,7 +33,7 @@ public class SElectrodomesticoService {
         SubCategoriaElectrodomestico electrodomestico = modelMapper.map(dto, SubCategoriaElectrodomestico.class);
 
         Usuario usuario = new Usuario();
-        usuario.setIdUsuario(dto.getUsuario());
+        usuario.setIdUsuario(dto.getUsuarioid());
         electrodomestico.setUsuario(usuario);
         electrodomestico = SelectrodomesticoRepository.save(electrodomestico);
 
