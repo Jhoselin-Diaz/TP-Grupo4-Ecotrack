@@ -19,6 +19,7 @@ public class CategoriaController {
 
     @GetMapping("/lista")
     public List<CategoriaDTO> listar() {
+
         return categoriaService.obtenerCategorias();
     }
 

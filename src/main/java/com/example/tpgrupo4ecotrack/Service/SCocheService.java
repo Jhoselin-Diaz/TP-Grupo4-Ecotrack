@@ -33,7 +33,7 @@ public class SCocheService {
     }
 
     public List<SCocheDTO> listaCocheAdmin() {
-        log.info("Obteniendo lista de Alimentos");
+        log.info("Obteniendo lista de Coche");
         List<SubCategoriaCoche> coches = ScocheRepository.findAll();
         List<SCocheDTO> sCocheDTO = new ArrayList<>();
 
@@ -42,6 +42,8 @@ public class SCocheService {
             SCocheDTO dto = new SCocheDTO();
             dto.setIdCoche(coche.getIdCoche());
             dto.setMarca(coche.getMarca());
+            dto.setTipoGasolina(coche.getTipoGasolina());
+            dto.setNumeroCoches(coche.getNumeroCoches());
             dto.setEmisionesKgCO2_C(coche.getEmisionesKgCO2_C());
             dto.setEnviadoResultadoC(coche.getEnviadoResultadoC());
             dto.setFechaRegistro(coche.getFechaRegistro());

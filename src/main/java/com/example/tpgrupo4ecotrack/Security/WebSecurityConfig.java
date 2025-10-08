@@ -70,6 +70,12 @@ public class WebSecurityConfig {
                         .requestMatchers("/coches/total").hasAuthority("ADMIN")
                         .requestMatchers("/coches/registrar").hasAuthority("USER")
                         .requestMatchers("/coches/actualizar").hasAuthority("USER")
+                        .requestMatchers("/autobuses/registrar").hasAuthority("USER")
+                        .requestMatchers("/autobuses/elimina/**").hasAuthority("USER")
+                        .requestMatchers("/autobuses/total").hasAuthority("USER")
+                        .requestMatchers("/autobuses/listaAdmin").hasAuthority("USER")
+                        .requestMatchers("/autobuses/lista/MisAutobuses").hasAuthority("USER")
+                        .requestMatchers("/autobuses/actualizar/**").hasAuthority("USER")
 
                         .anyRequest().authenticated()
                 )

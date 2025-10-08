@@ -18,6 +18,7 @@ public class SAutobusDTO {
     private Float tranviaKm;
     private Float metroKm;
     private Float taxiKm;
+    private String tipoGasolina;
     private Float emisionesKgCO2_A;
     private Boolean enviadoResultadoA;
     private LocalDateTime fechaRegistro;

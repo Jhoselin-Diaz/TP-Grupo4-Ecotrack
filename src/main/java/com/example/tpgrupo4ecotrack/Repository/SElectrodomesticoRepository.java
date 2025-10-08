@@ -1,5 +1,6 @@
 package com.example.tpgrupo4ecotrack.Repository;
 
+import com.example.tpgrupo4ecotrack.Entity.SubCategoriaCoche;
 import com.example.tpgrupo4ecotrack.Entity.SubCategoriaElectrodomestico;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,6 +10,9 @@ import java.util.Date;
 import java.util.List;
 
 public interface SElectrodomesticoRepository extends JpaRepository<SubCategoriaElectrodomestico, Long> {
+
+    List<SubCategoriaElectrodomestico> findByUsuario_IdUsuario(Long usuarioId);
+
     @Query("SELECT SUM(e.emisionesKgCO2_E) FROM SubCategoriaElectrodomestico e " +
             "WHERE e.usuario.idUsuario = :usuarioId")
     Long getTotalEmisionesByUsuario(

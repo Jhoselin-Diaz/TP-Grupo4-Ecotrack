@@ -1,15 +1,17 @@
 package com.example.tpgrupo4ecotrack.DTO;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SAutobusCreateDTO {
+public class ListarAutobusDTO {
+    private Long idAutobus;
     private Float autobusKm;
     private Float autocarKm;
     private Float trenNacionalKm;
@@ -17,5 +19,7 @@ public class SAutobusCreateDTO {
     private Float metroKm;
     private Float taxiKm;
     private String tipoGasolina;
-
+    private Float emisionesKgCO2_A;
+    private Boolean enviadoResultadoA;
+    private LocalDateTime fechaRegistro;
 }

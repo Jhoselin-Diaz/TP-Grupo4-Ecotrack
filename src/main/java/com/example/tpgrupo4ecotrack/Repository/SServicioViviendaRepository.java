@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface SServicioViviendaRepository extends JpaRepository<SubCategoriaServicioVivienda, Long> {
+
     List<SubCategoriaServicioVivienda> findByUsuario_IdUsuario(Long usuarioId);
 
     @Query("SELECT SUM(a.emisionesKgCO2_S) " +

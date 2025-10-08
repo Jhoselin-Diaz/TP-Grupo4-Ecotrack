@@ -10,14 +10,11 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SElectrodomesticoDTO {
+public class ListarElectDTO {
     private Long idElectrodomestico;
     private String tipoElectrodomestico;
     private Float consumoKWh;
     private Float emisionesKgCO2_E;
     private Boolean enviadoResultadoE;
     private LocalDateTime fechaRegistro;
-    private Long categoriaid;
-    private Long factorid;
-    private Long usuarioid;
 }
