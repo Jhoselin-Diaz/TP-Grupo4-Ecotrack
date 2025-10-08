@@ -17,36 +17,27 @@ public class ResultadoDetalle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDetalle;
 
-    private float emisionesKgCO2;
+    private String nombreItem;
+    private String categoria;
+    private Float cantidad;
+    private Float emisionesKgCO2;
 
     @ManyToOne
-    @JoinColumn(name = "id_resultado")
+    @JoinColumn(name = "resultado_id")
     private Resultado resultado;
 
-    @ManyToOne
-    @JoinColumn(name = "id_servicio")
-    private SubCategoriaServicioVivienda servicio;
 
-    @ManyToOne
-    @JoinColumn(name = "id_coche")
-    private SubCategoriaCoche coche;
+    public void setAlimento(SubCategoriaAlimento a) {
+    }
+    public void setRopa(SubCategoriaRopa r) {
+    }
+    public void setCoche(SubCategoriaCoche c) {
+    }
+    public void setAutobus(SubCategoriaAutobus b) {
+    }
+    public void setElectrodomestico(SubCategoriaElectrodomestico e) {
+    }
 
-    @ManyToOne
-    @JoinColumn(name = "id_autobus")
-    private SubCategoriaAutobus autobus;
-
-    @ManyToOne
-    @JoinColumn(name = "id_alimento")
-    private SubCategoriaAlimento alimento;
-
-    @ManyToOne
-    @JoinColumn(name = "id_electrodomestico")
-    private SubCategoriaElectrodomestico electrodomestico;
-
-    @ManyToOne
-    @JoinColumn(name = "id_ropa")
-    private SubCategoriaRopa ropa;
-
-
-
+    public void setServicio(SubCategoriaServicioVivienda s) {
+    }
 }

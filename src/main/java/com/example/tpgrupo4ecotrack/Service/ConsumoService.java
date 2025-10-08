@@ -7,8 +7,8 @@ import com.example.tpgrupo4ecotrack.Repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -36,124 +36,136 @@ public class ConsumoService {
     } // Helper: convierte Number (Double/Float/primitivos) a Float seguro
 
 
-    private Float toFloat(Number n) {
-        return n == null ? 0f : n.floatValue();
+    private Float toFloat(Number value) {
+
+        return value == null ? 0f : value.floatValue();
     }
 
 
-    public List<ConsumoDTO> getConsumos(Long usuarioId, Date fechaInicio, Date fechaFin) {
+    public List<ConsumoDTO> getConsumos(Long usuarioId, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
         List<ConsumoDTO> resultado = new ArrayList<>();
-
 
         // -------- Alimentos --------
         List<SubCategoriaAlimento> alimentos = alimentoRepo.findByUsuarioAndFecha(usuarioId, fechaInicio, fechaFin);
-        if (alimentos != null) { for (SubCategoriaAlimento a : alimentos) {
-            resultado.add(new ConsumoDTO( "Alimento",
-                    a.getNombreAlimento(),
-                    toFloat(a.getCantidadKg()),
-                    toFloat(a.getEmisionesKgCO2_AL()) )); } }
+        if (alimentos != null && !alimentos.isEmpty()) {
+            for (SubCategoriaAlimento a : alimentos) {
+                resultado.add(new ConsumoDTO(
+                        "Alimento",
+                        a.getNombreAlimento(),
+                        toFloat(a.getCantidadKg()),
+                        toFloat(a.getEmisionesKgCO2_AL())
+                ));
+            }
+        }
 
         // -------- Ropa --------
         List<SubCategoriaRopa> ropas = ropaRepo.findByUsuarioAndFecha(usuarioId, fechaInicio, fechaFin);
-        if (ropas != null) { for (SubCategoriaRopa r : ropas) {
-            resultado.add(new ConsumoDTO( "Ropa",
-                    r.getTipoPrenda(),
-                    toFloat(r.getCantidadKg()),
-                    toFloat(r.getEmisionesKgCO2_R()) )); } }
+        if (ropas != null && !ropas.isEmpty()) {
+            for (SubCategoriaRopa r : ropas) {
+                resultado.add(new ConsumoDTO(
+                        "Ropa",
+                        r.getTipoPrenda(),
+                        toFloat(r.getCantidadKg()),
+                        toFloat(r.getEmisionesKgCO2_R())
+                ));
+            }
+        }
 
         // -------- Electrodomésticos --------
         List<SubCategoriaElectrodomestico> electros = electroRepo.findByUsuarioAndFecha(usuarioId, fechaInicio, fechaFin);
-        if (electros != null) { for (SubCategoriaElectrodomestico e : electros) {
-            resultado.add(new ConsumoDTO( "Electrodomestico",
-                    e.getTipoElectrodomestico(),
-                    toFloat(e.getConsumoKWh()),
-                    toFloat(e.getEmisionesKgCO2_E()) )); } }
+        if (electros != null && !electros.isEmpty()) {
+            for (SubCategoriaElectrodomestico e : electros) {
+                resultado.add(new ConsumoDTO(
+                        "Electrodomestico",
+                        e.getTipoElectrodomestico(),
+                        toFloat(e.getConsumoKWh()),
+                        toFloat(e.getEmisionesKgCO2_E())
+                ));
+            }
+        }
 
         // -------- Coches --------
         List<SubCategoriaCoche> coches = cocheRepo.findByUsuarioAndFecha(usuarioId, fechaInicio, fechaFin);
-        if (coches != null) { for (SubCategoriaCoche c : coches) {
-            resultado.add(new ConsumoDTO( "Coche",
-                    c.getMarca() != null ? c.getMarca() : "Coche",
-                    toFloat(c.getKilometrajeTotal()),
-                    toFloat(c.getEmisionesKgCO2_C()) )); } }
+        if (coches != null && !coches.isEmpty()) {
+            for (SubCategoriaCoche c : coches) {
+                resultado.add(new ConsumoDTO(
+                        "Coche",
+                        c.getMarca() != null ? c.getMarca() : "Coche",
+                        toFloat(c.getKilometrajeTotal()),
+                        toFloat(c.getEmisionesKgCO2_C())
+                ));
+            }
+        }
 
         // -------- Autobuses / Transporte público (varios campos de km) --------
         List<SubCategoriaAutobus> autobuses = autobusRepo.findByUsuarioAndFecha(usuarioId, fechaInicio, fechaFin);
-        if (autobuses != null) {
+        if (autobuses != null && !autobuses.isEmpty()) {
             for (SubCategoriaAutobus b : autobuses) {
-                double autobusKm = b.getAutobusKm() == null ? 0d : b.getAutobusKm();
-                double autocarKm = b.getAutocarKm() == null ? 0d : b.getAutocarKm();
-                double trenKm = b.getTrenNacionalKm() == null ? 0d : b.getTrenNacionalKm();
-                double tranviaKm = b.getTranviaKm() == null ? 0d : b.getTranviaKm();
-                double metroKm = b.getMetroKm() == null ? 0d : b.getMetroKm();
-                double taxiKm = b.getTaxiKm() == null ? 0d : b.getTaxiKm();
-                double totalKm = autobusKm + autocarKm + trenKm + tranviaKm + metroKm + taxiKm;
-                double totalEmisiones = toFloat(b.getEmisionesKgCO2_A()); // Para cada tipo con km > 0, creamos una fila.
+                float autobusKm = b.getAutobusKm() == null ? 0f : b.getAutobusKm();
+                float autocarKm = b.getAutocarKm() == null ? 0f : b.getAutocarKm();
+                float trenKm = b.getTrenNacionalKm() == null ? 0f : b.getTrenNacionalKm();
+                float tranviaKm = b.getTranviaKm() == null ? 0f : b.getTranviaKm();
+                float metroKm = b.getMetroKm() == null ? 0f : b.getMetroKm();
+                float taxiKm = b.getTaxiKm() == null ? 0f : b.getTaxiKm();
 
-                if (autobusKm > 0) {
-                    double emis = totalKm > 0 ? totalEmisiones * (autobusKm / totalKm) : 0;
-                    resultado.add(new ConsumoDTO("Autobus", "Autobus",
-                            (float) autobusKm, (float) emis)); }
+                float totalKm = autobusKm + autocarKm + trenKm + tranviaKm + metroKm + taxiKm;
+                float totalEmisiones = toFloat(b.getEmisionesKgCO2_A());
 
-                if (autocarKm > 0) {
-                    double emis = totalKm > 0 ? totalEmisiones * (autocarKm / totalKm) : 0;
-                    resultado.add(new ConsumoDTO("Autobus", "Autocar",
-                            (float) autocarKm, (float) emis)); }
-
-                if (trenKm > 0) {
-                    double emis = totalKm > 0 ? totalEmisiones * (trenKm / totalKm) : 0;
-                    resultado.add(new ConsumoDTO("Autobus", "Tren Nacional",
-                            (float) trenKm, (float) emis)); }
-
-                if (tranviaKm > 0) {
-                    double emis = totalKm > 0 ? totalEmisiones * (tranviaKm / totalKm) : 0;
-                    resultado.add(new ConsumoDTO("Autobus", "Tranvía",
-                            (float) tranviaKm, (float) emis)); }
-
-                if (metroKm > 0) {
-                    double emis = totalKm > 0 ? totalEmisiones * (metroKm / totalKm) : 0;
-                    resultado.add(new ConsumoDTO("Autobus", "Metro",
-                            (float) metroKm, (float) emis)); }
-
-                if (taxiKm > 0) {
-                    double emis = totalKm > 0 ? totalEmisiones * (taxiKm / totalKm) : 0;
-                    resultado.add(new ConsumoDTO("Autobus", "Taxi",
-                            (float) taxiKm, (float) emis)); } } }
+                if (autobusKm > 0f) {
+                    float emis = totalKm > 0f ? totalEmisiones * (autobusKm / totalKm) : 0f;
+                    resultado.add(new ConsumoDTO("Autobus", "Autobus", autobusKm, emis));
+                }
+                if (autocarKm > 0f) {
+                    float emis = totalKm > 0f ? totalEmisiones * (autocarKm / totalKm) : 0f;
+                    resultado.add(new ConsumoDTO("Autobus", "Autocar", autocarKm, emis));
+                }
+                if (trenKm > 0f) {
+                    float emis = totalKm > 0f ? totalEmisiones * (trenKm / totalKm) : 0f;
+                    resultado.add(new ConsumoDTO("Autobus", "Tren Nacional", trenKm, emis));
+                }
+                if (tranviaKm > 0f) {
+                    float emis = totalKm > 0f ? totalEmisiones * (tranviaKm / totalKm) : 0f;
+                    resultado.add(new ConsumoDTO("Autobus", "Tranvía", tranviaKm, emis));
+                }
+                if (metroKm > 0f) {
+                    float emis = totalKm > 0f ? totalEmisiones * (metroKm / totalKm) : 0f;
+                    resultado.add(new ConsumoDTO("Autobus", "Metro", metroKm, emis));
+                }
+                if (taxiKm > 0f) {
+                    float emis = totalKm > 0f ? totalEmisiones * (taxiKm / totalKm) : 0f;
+                    resultado.add(new ConsumoDTO("Autobus", "Taxi", taxiKm, emis));
+                }
+            }
+        }
 
         // -------- Servicios de Vivienda (varios campos) --------
         List<SubCategoriaServicioVivienda> servicios = servicioRepo.findByUsuarioAndFecha(usuarioId, fechaInicio, fechaFin);
-        if (servicios != null) {
+        if (servicios != null && !servicios.isEmpty()) {
             for (SubCategoriaServicioVivienda s : servicios) {
-                double electr = s.getElectricidadKWh() == null ? 0d : s.getElectricidadKWh();
-                double gas = s.getGasNaturalM3() == null ? 0d : s.getGasNaturalM3();
-                double carbon = s.getCarbonKl() == null ? 0d : s.getCarbonKl();
-                double total = electr + gas + carbon;
-                double totalEm = toFloat(s.getEmisionesKgCO2_S());
+                float electr = s.getElectricidadKWh() == null ? 0f : s.getElectricidadKWh();
+                float gas = s.getGasNaturalM3() == null ? 0f : s.getGasNaturalM3();
+                float carbon = s.getCarbonKl() == null ? 0f : s.getCarbonKl();
+                float total = electr + gas + carbon;
+                float totalEm = toFloat(s.getEmisionesKgCO2_S());
 
-                if (electr > 0) {
-                    double emis = total > 0 ? totalEm * (electr / total) : 0;
-                    resultado.add(new ConsumoDTO("ServicioVivienda", "Electricidad",
-                            (float) electr, (float) emis));
+                if (electr > 0f) {
+                    float emis = total > 0f ? totalEm * (electr / total) : 0f;
+                    resultado.add(new ConsumoDTO("ServicioVivienda", "Electricidad", electr, emis));
                 }
-
-                if (gas > 0) {
-                    double emis = total > 0 ? totalEm * (gas / total) : 0;
-                    resultado.add(new ConsumoDTO("ServicioVivienda", "Gas Natural",
-                            (float) gas, (float) emis));
+                if (gas > 0f) {
+                    float emis = total > 0f ? totalEm * (gas / total) : 0f;
+                    resultado.add(new ConsumoDTO("ServicioVivienda", "Gas Natural", gas, emis));
                 }
-
-                if (carbon > 0) {
-                    double emis = total > 0 ? totalEm * (carbon / total) : 0;
-                    resultado.add(new ConsumoDTO("ServicioVivienda", "Carbón",
-                            (float) carbon, (float) emis));
+                if (carbon > 0f) {
+                    float emis = total > 0f ? totalEm * (carbon / total) : 0f;
+                    resultado.add(new ConsumoDTO("ServicioVivienda", "Carbón", carbon, emis));
                 }
-
             }
         }
 
         return resultado;
-
     }
+
 
 
 }

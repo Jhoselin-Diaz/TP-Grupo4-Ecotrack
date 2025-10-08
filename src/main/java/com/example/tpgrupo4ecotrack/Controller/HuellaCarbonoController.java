@@ -1,11 +1,14 @@
 package com.example.tpgrupo4ecotrack.Controller;
 
 import com.example.tpgrupo4ecotrack.DTO.HuellaDTO;
+import com.example.tpgrupo4ecotrack.DTO.SAlimentoDTO;
 import com.example.tpgrupo4ecotrack.Entity.HuellaCarbono;
 import com.example.tpgrupo4ecotrack.Service.HuellaCarbonoService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,24 +26,19 @@ public class HuellaCarbonoController {
 
     @GetMapping("/lista")
     public List<HuellaDTO> listar() {
-        return huellaCarbonoService.obtenerHuellas();
+
+        return huellaCarbonoService.lista();
     }
 
-    @PostMapping("/inserta")
-    public ResponseEntity<HuellaDTO> insertar(@RequestBody HuellaDTO huellaDTO) {
-        return new ResponseEntity<>(huellaCarbonoService.insertar(huellaDTO), HttpStatus.CREATED);
-    }
-
-    @GetMapping("/encontrar/{usuarioID}/{anioInicio}/{anioFin}")
-    public ResponseEntity<List<HuellaDTO>> consultarPorRango(
-            @PathVariable Long usuarioID,
-            @PathVariable LocalDate anioInicio,
-            @PathVariable LocalDate anioFin) {
-        return new ResponseEntity<>(huellaCarbonoService.EncontrarEntreAnio(usuarioID, anioInicio, anioFin), HttpStatus.OK);
+    @PostMapping("/calcular/{idUsuario}")
+    public ResponseEntity<HuellaDTO> calcularHuellaPorId(@PathVariable Long idUsuario) {
+        HuellaDTO huella = huellaCarbonoService.calcularYGuardarHuellaPorId(idUsuario);
+        return ResponseEntity.ok(huella);
     }
 
     @DeleteMapping("/elimina/{id}")
     public String eliminar(@PathVariable Long id) {
+
         return huellaCarbonoService.eliminar(id);
     }
 }

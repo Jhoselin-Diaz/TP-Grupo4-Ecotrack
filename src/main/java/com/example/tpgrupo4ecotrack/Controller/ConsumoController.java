@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -19,8 +20,14 @@ public class ConsumoController {
         this.consumoService = consumoService; }
 
     @GetMapping("/mostrar/{usuarioId}")
-    public ResponseEntity<List<ConsumoDTO>> getConsumos(@PathVariable Long usuarioId, @RequestParam("fechaInicio") @DateTimeFormat(pattern = "yyyy-MM-dd")
-    Date fechaInicio, @RequestParam("fechaFin") @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaFin) {
+    public ResponseEntity<List<ConsumoDTO>> getConsumos(
+            @PathVariable Long usuarioId,
+            @RequestParam("fechaInicio")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
+            @RequestParam("fechaFin")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
+
         List<ConsumoDTO> consumos = consumoService.getConsumos(usuarioId, fechaInicio, fechaFin);
-        return new ResponseEntity<>(consumos, HttpStatus.OK); }
+        return ResponseEntity.ok(consumos);
+    }
 }

@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface ResultadoDetalleRepository extends JpaRepository<ResultadoDetalle, Long> {
 
-
+    List<ResultadoDetalle> findByResultado_IdResultado(Long resultadoId);
 }

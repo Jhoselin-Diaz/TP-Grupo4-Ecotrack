@@ -1,10 +1,8 @@
 package com.example.tpgrupo4ecotrack.Service;
 
 import com.example.tpgrupo4ecotrack.DTO.ResultadoDTO;
-import com.example.tpgrupo4ecotrack.Entity.Categoria;
-import com.example.tpgrupo4ecotrack.Entity.HuellaCarbono;
-import com.example.tpgrupo4ecotrack.Entity.Resultado;
-import com.example.tpgrupo4ecotrack.Repository.ResultadoRepository;
+import com.example.tpgrupo4ecotrack.Entity.*;
+import com.example.tpgrupo4ecotrack.Repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,41 +14,70 @@ import java.util.List;
 public class ResultadoService {
 
     private final ResultadoRepository resultadoRepository;
-    public ResultadoService(ResultadoRepository resultadoRepository) {
+    private final CategoriaRepository categoriaRepository;
+    private final SAlimentoRepository alimentoRepo;
+    private final SRopaRepository ropaRepo;
+    private final SCocheRepository cocheRepo;
+    private final SAutobusRepository autobusRepo;
+    private final SElectrodomesticoRepository electroRepo;
+    private final SServicioViviendaRepository servicioRepo;
+    private final ResultadoDetalleService resultadoDetalleService;
+    private final ResultadoEquivalenciaService resultadoEquivalenciaService;
+
+    public ResultadoService(ResultadoRepository resultadoRepository, CategoriaRepository categoriaRepository, SAlimentoRepository alimentoRepo,
+                            SRopaRepository ropaRepo, SCocheRepository cocheRepo, SAutobusRepository autobusRepo,
+                            SElectrodomesticoRepository electroRepo, SServicioViviendaRepository servicioRepo, ResultadoDetalleService resultadoDetalleService, ResultadoEquivalenciaService resultadoEquivalenciaService) {
+
         this.resultadoRepository = resultadoRepository;
+        this.categoriaRepository = categoriaRepository;
+        this.alimentoRepo = alimentoRepo;
+        this.ropaRepo = ropaRepo;
+        this.cocheRepo = cocheRepo;
+        this.autobusRepo = autobusRepo;
+        this.electroRepo = electroRepo;
+        this.servicioRepo = servicioRepo;
+        this.resultadoDetalleService = resultadoDetalleService;
+        this.resultadoEquivalenciaService = resultadoEquivalenciaService;
     }
 
-    public List<ResultadoDTO> obtenerResultados() {
-        log.info("Obteniendo lista de resultados");
-        List<Resultado> lista = resultadoRepository.findAll();
-        List<ResultadoDTO> dtoList = new ArrayList<>();
-        for (Resultado r : lista) {
-            ResultadoDTO dto = new ResultadoDTO();
-            dto.setIdResultado(r.getIdResultado());
-            if (r.getHuella() != null) dto.setHuellaId(r.getHuella().getIdHuella());
-            if (r.getCategoria() != null) dto.setCategoriaId(r.getCategoria().getIdCategoria());
-            dtoList.add(dto);
-        }
-        return dtoList;
+    // 🔹 Generar resultados agrupados por categoría
+    public void generarResultadosPorHuella(HuellaCarbono huella) {
+        Long usuarioId = huella.getUsuario().getIdUsuario();
+
+        crearResultadoPorCategoria("Alimento", huella, alimentoRepo.findByUsuario_IdUsuario(usuarioId));
+        crearResultadoPorCategoria("Ropa", huella, ropaRepo.findByUsuario_IdUsuario(usuarioId));
+        crearResultadoPorCategoria("Coche", huella, cocheRepo.findByUsuario_IdUsuario(usuarioId));
+        crearResultadoPorCategoria("Autobus", huella, autobusRepo.findByUsuario_IdUsuario(usuarioId));
+        crearResultadoPorCategoria("Electrodomestico", huella, electroRepo.findByUsuario_IdUsuario(usuarioId));
+        crearResultadoPorCategoria("Servicio y Vivienda", huella, servicioRepo.findByUsuario_IdUsuario(usuarioId));
     }
 
-    public Resultado insertar(ResultadoDTO dto) {
-        log.info("Insertando resultado");
-        Resultado r = new Resultado();
+    // 🔹 Crear resultado por categoría
+    private <T> void crearResultadoPorCategoria(String nombreCategoria, HuellaCarbono huella, List<T> registros) {
+        if (registros == null || registros.isEmpty()) return;
 
-        if (dto.getHuellaId() != null) {
-            HuellaCarbono h = new HuellaCarbono();
-            h.setIdHuella(dto.getHuellaId());
-            r.setHuella(h);
-        }
-        if (dto.getCategoriaId() != null) {
-            Categoria c = new Categoria();
-            c.setIdCategoria(dto.getCategoriaId());
-            r.setCategoria(c);
-        }
+        Categoria categoria = categoriaRepository.findByNombreCategoriaIgnoreCase(nombreCategoria)
+                .orElseThrow(() -> new RuntimeException("Categoría '" + nombreCategoria + "' no encontrada"));
 
-        return resultadoRepository.save(r);
+        Resultado resultado = new Resultado();
+        resultado.setCategoria(categoria);
+        resultado.setHuella(huella);
+
+        resultado = resultadoRepository.save(resultado);
+
+        float totalEmisiones = resultadoDetalleService.crearDetallesPorCategoria(resultado, registros);
+
+        // Luego generar equivalencias basadas en totalEmisiones
+        resultadoEquivalenciaService.generarEquivalencias(resultado, totalEmisiones);
     }
+
+    // Obtener resultados de un usuario
+    public List<Resultado> obtenerResultadosPorUsuario(Long usuarioId) {
+        return resultadoRepository.findByHuella_Usuario_IdUsuario(usuarioId);
+    }
+
+
+
 
     public String eliminar(Long id) {
         log.warn("Eliminando resultado con ID: {}", id);
