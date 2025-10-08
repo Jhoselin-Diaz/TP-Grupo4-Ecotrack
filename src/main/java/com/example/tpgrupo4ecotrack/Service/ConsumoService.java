@@ -126,11 +126,8 @@ public class ConsumoService {
             for (SubCategoriaServicioVivienda s : servicios) {
                 double electr = s.getElectricidadKWh() == null ? 0d : s.getElectricidadKWh();
                 double gas = s.getGasNaturalM3() == null ? 0d : s.getGasNaturalM3();
-                double gasolina = s.getGasolinaL() == null ? 0d : s.getGasolinaL();
                 double carbon = s.getCarbonKl() == null ? 0d : s.getCarbonKl();
-                double glp = s.getGlpKl() == null ? 0d : s.getGlpKl();
-                double propano = s.getPropanoKl() == null ? 0d : s.getPropanoKl();
-                double total = electr + gas + gasolina + carbon + glp + propano;
+                double total = electr + gas + carbon;
                 double totalEm = toFloat(s.getEmisionesKgCO2_S());
 
                 if (electr > 0) {
@@ -145,28 +142,10 @@ public class ConsumoService {
                             (float) gas, (float) emis));
                 }
 
-                if (gasolina > 0) {
-                    double emis = total > 0 ? totalEm * (gasolina / total) : 0;
-                    resultado.add(new ConsumoDTO("ServicioVivienda", "Gasolina",
-                            (float) gasolina, (float) emis));
-                }
-
                 if (carbon > 0) {
                     double emis = total > 0 ? totalEm * (carbon / total) : 0;
                     resultado.add(new ConsumoDTO("ServicioVivienda", "Carbón",
                             (float) carbon, (float) emis));
-                }
-
-                if (glp > 0) {
-                    double emis = total > 0 ? totalEm * (glp / total) : 0;
-                    resultado.add(new ConsumoDTO("ServicioVivienda", "GLP",
-                            (float) glp, (float) emis));
-                }
-
-                if (propano > 0) {
-                    double emis = total > 0 ? totalEm * (propano / total) : 0;
-                    resultado.add(new ConsumoDTO("ServicioVivienda", "Propano",
-                            (float) propano, (float) emis));
                 }
 
             }

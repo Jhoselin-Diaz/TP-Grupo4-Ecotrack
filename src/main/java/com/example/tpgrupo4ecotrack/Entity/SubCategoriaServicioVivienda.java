@@ -21,10 +21,7 @@ public class SubCategoriaServicioVivienda {
 
     private Float electricidadKWh;
     private Float gasNaturalM3;
-    private Float gasolinaL;
     private Float carbonKl;
-    private Float glpKl;
-    private Float propanoKl;
     private Float emisionesKgCO2_S;
     private Boolean enviadoResultadoS;
     private LocalDateTime fechaRegistro;

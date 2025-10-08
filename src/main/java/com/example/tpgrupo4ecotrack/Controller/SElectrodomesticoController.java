@@ -22,13 +22,6 @@ public class SElectrodomesticoController {
         return new ResponseEntity<>(SElectrodomesticoService.insertar(dto), HttpStatus.OK);
     }
 
-    @GetMapping("/total/{usuarioId}")
-    public ResponseEntity<HuellaDTO> getTotalEmisionesElectrodomestico(@PathVariable Long usuarioId) {
-        HuellaDTO huellaDTO = new HuellaDTO();
-        huellaDTO.setTotalKgCO2(SElectrodomesticoService.getTotalEmisionesElectrodomestico(usuarioId));
-        return new ResponseEntity<>(huellaDTO, HttpStatus.OK);
-    }
-
     @DeleteMapping("/elimina/{id}")
     public String eliminar(@PathVariable Long id) {
         return SElectrodomesticoService.eliminar(id);

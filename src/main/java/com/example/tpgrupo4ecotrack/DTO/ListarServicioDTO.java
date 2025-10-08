@@ -14,10 +14,7 @@ public class ListarServicioDTO {
     private Long idServicios;
     private Double electricidadKWh;
     private Double gasNaturalM3;
-    private Double gasolinaL;
     private Double carbonKl;
-    private Double glpKl;
-    private Double propanoKl;
     private Double emisionesKgCO2_S;
     private Boolean enviadoResultadoS;
     private Date fechaRegistro;

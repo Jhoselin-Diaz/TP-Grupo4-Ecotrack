@@ -14,18 +14,20 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
 public class SAutobusService {
 
-    private final SAutobusRepository SautobusRepository;
+    private final SAutobusRepository sautobusRepository;
     private final UsuarioRepository usuarioRepository;
     private final FactorEmisionRepository factorEmisionRepository;
     private final CategoriaRepository categoriaRepository;
 
-    public SAutobusService(SAutobusRepository SautobusRepository, UsuarioRepository usuarioRepository, FactorEmisionRepository factorEmisionRepository, CategoriaRepository categoriaRepository ) {
-        this.SautobusRepository = SautobusRepository;
+    public SAutobusService(SAutobusRepository sautobusRepository, UsuarioRepository usuarioRepository, FactorEmisionRepository factorEmisionRepository, CategoriaRepository categoriaRepository ) {
+        this.sautobusRepository = sautobusRepository;
         this.usuarioRepository = usuarioRepository;
         this.factorEmisionRepository = factorEmisionRepository;
         this.categoriaRepository = categoriaRepository;
@@ -33,7 +35,7 @@ public class SAutobusService {
 
     public List<SAutobusDTO> listaAutobusAdmin() {
         log.info("Obteniendo lista de Autobus");
-        List<SubCategoriaAutobus> autobus = SautobusRepository.findAll();
+        List<SubCategoriaAutobus> autobus = sautobusRepository.findAll();
         List<SAutobusDTO> sAutobusDTO = new ArrayList<>();
 
         // Recorre cada objeto coche obtenido del repositorio
@@ -61,7 +63,7 @@ public class SAutobusService {
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        List<SubCategoriaAutobus> lista = SautobusRepository.findByUsuario_IdUsuario(usuario.getIdUsuario());
+        List<SubCategoriaAutobus> lista = sautobusRepository.findByUsuario_IdUsuario(usuario.getIdUsuario());
         ModelMapper modelMapper = new ModelMapper();
 
         return lista.stream()
@@ -71,34 +73,23 @@ public class SAutobusService {
 
     public SAutobusDTO Registrar(SAutobusCreateDTO dto, String username) {
 
+
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Detecta automáticamente el código del factor según el nombre
-        String nombre = dto.getTipoGasolina().toLowerCase();
-        String codigoFactor;
+        String codigoFactor = detectarCodigoFactor(dto.getTipoGasolina());
+        if (codigoFactor == null)
+            throw new RuntimeException("No se pudo detectar el tipo de combustible: " + dto.getTipoGasolina());
 
-        if (nombre.contains("gas licuado") || nombre.contains("licuado") || nombre.contains("petroleo") ||
-                nombre.contains("glp")) codigoFactor = "GLP";
-        else if (nombre.contains("gas natural") || nombre.contains("gnv")) codigoFactor = "GAS_NAT";
-        else if (nombre.contains("nafta ")) codigoFactor = "NAFTA";
-        else if (nombre.contains("diesel")) codigoFactor = "AUTO_DIESEL";
-        else if (nombre.contains("gasolina")) codigoFactor = "AUTO_PETROL";
-        else codigoFactor = "";
-
-        // Busca el factor según el código
         FactorEmision factor = factorEmisionRepository.findByCodigoIgnoreCase(codigoFactor)
                 .orElseThrow(() -> new RuntimeException("Factor no encontrado: " + codigoFactor));
 
-        // Busca la categoría
-        Categoria categoria = categoriaRepository.findByNombreCategoriaIgnoreCase("Autobus")
-                .orElseThrow(() -> new RuntimeException("Categoría 'Autobus' no encontrada"));
+        Categoria categoria = categoriaRepository.findByNombreCategoriaIgnoreCase("Autobús")
+                .orElseThrow(() -> new RuntimeException("Categoría 'Autobús' no encontrada"));
 
-        // Calcula las emisiones
-        Float emisiones = factor.getFactorKgCO2PorUnidad() * (dto.getAutobusKm() + dto.getTaxiKm()
-                + dto.getAutocarKm() + dto.getMetroKm() + dto.getTranviaKm() + dto.getTrenNacionalKm());
+        Float km = dto.getAutobusKm() != null ? dto.getAutobusKm() : 0f;
+        Float emisiones = factor.getFactorKgCO2PorUnidad() * km;
 
-        // Crea entidad
         SubCategoriaAutobus autobus = new SubCategoriaAutobus();
         autobus.setTipoGasolina(dto.getTipoGasolina());
         autobus.setAutobusKm(dto.getAutobusKm());
@@ -108,65 +99,80 @@ public class SAutobusService {
         autobus.setTranviaKm(dto.getTranviaKm());
         autobus.setTrenNacionalKm(dto.getTrenNacionalKm());
         autobus.setEmisionesKgCO2_A(emisiones);
-        autobus.setEnviadoResultadoA(false);
+        autobus.setEnviadoResultadoA(true);
         autobus.setFechaRegistro(LocalDateTime.now());
         autobus.setUsuario(usuario);
         autobus.setCategoria(categoria);
         autobus.setFactor(factor);
 
-        SautobusRepository.save(autobus);
+        sautobusRepository.save(autobus);
 
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(autobus, SAutobusDTO.class);
     }
 
-    public SAutobusDTO actualizar(Long id, SAutobusCreateDTO dto, String username) {
-        SubCategoriaAutobus autobus = SautobusRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Autobus no encontrado"));
+    private String detectarCodigoFactor(String tipoGasolina) {
+        String nombre = tipoGasolina.toLowerCase();
+        if (nombre.contains("gas licuado") || nombre.contains("licuado") || nombre.contains("petroleo") || nombre.contains("glp"))
+            return "GLP";
+        else if (nombre.contains("gas natural") || nombre.contains("gnv"))
+            return "GAS_NAT";
+        else if (nombre.contains("nafta"))
+            return "NAFTA";
+        else if (nombre.contains("diesel"))
+            return "AUTO_DIESEL";
+        else if (nombre.contains("gasolina"))
+            return "AUTO_PETROL";
+        else
+            return null;
+    }
 
-        // Validar que el usuario autenticado sea el dueño del registro
+    public SAutobusDTO actualizar(Long id, SAutobusCreateDTO dto, String username) {
+        SubCategoriaAutobus autobus = sautobusRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Autobús no encontrado"));
+
+        // Valida que el registro pertenece al usuario autenticado
         if (!autobus.getUsuario().getUsername().equals(username)) {
-            throw new RuntimeException("No tienes permiso para actualizar este auto");
+            throw new RuntimeException("No tienes permiso para actualizar este registro");
         }
 
-        // Solo actualiza los campos que el usuario quiera
-        if (dto.getAutobusKm() != null && !Float.isNaN(dto.getAutobusKm()))
-            autobus.setAutobusKm(dto.getAutobusKm());
-        if (dto.getAutocarKm() != null && !Float.isNaN(dto.getAutocarKm()))
-            autobus.setAutocarKm(dto.getAutocarKm());
-        if (dto.getMetroKm() != null && !Float.isNaN(dto.getMetroKm()))
-            autobus.setMetroKm(dto.getMetroKm());
-        if (dto.getTaxiKm() != null && !Float.isNaN(dto.getTaxiKm()))
-            autobus.setTaxiKm(dto.getTaxiKm());
-        if (dto.getTranviaKm() != null && !Float.isNaN(dto.getTranviaKm()))
-            autobus.setTranviaKm(dto.getTranviaKm());
-        if (dto.getTrenNacionalKm() != null && !Float.isNaN(dto.getTrenNacionalKm()))
-            autobus.setTrenNacionalKm(dto.getTrenNacionalKm());
-        if (dto.getTipoGasolina() != null && !dto.getTipoGasolina().isBlank())
+        // Actualiza solo los campos que el usuario haya enviado
+        if (dto.getAutobusKm() != null) autobus.setAutobusKm(dto.getAutobusKm());
+        if (dto.getAutocarKm() != null) autobus.setAutocarKm(dto.getAutocarKm());
+        if (dto.getMetroKm() != null) autobus.setMetroKm(dto.getMetroKm());
+        if (dto.getTaxiKm() != null) autobus.setTaxiKm(dto.getTaxiKm());
+        if (dto.getTranviaKm() != null) autobus.setTranviaKm(dto.getTranviaKm());
+        if (dto.getTrenNacionalKm() != null) autobus.setTrenNacionalKm(dto.getTrenNacionalKm());
+        if (dto.getTipoGasolina() != null && !dto.getTipoGasolina().isBlank()) {
             autobus.setTipoGasolina(dto.getTipoGasolina());
+        }
 
-        // Actualiza el factor automáticamente según el nombre
-        String nombre = autobus.getTipoGasolina().toLowerCase();
-        String codigoFactor;
+        // Detecta el factor según el tipo de gasolina actual
+        String codigoFactor = detectarCodigoFactor(autobus.getTipoGasolina());
+        if (codigoFactor == null)
+            throw new RuntimeException("No se pudo detectar el tipo de combustible: " + autobus.getTipoGasolina());
 
-        if (nombre.contains("gas licuado") || nombre.contains("licuado") || nombre.contains("petroleo") ||
-                nombre.contains("glp")) codigoFactor = "GLP";
-        else if (nombre.contains("gas natural") || nombre.contains("gnv")) codigoFactor = "GAS_NAT";
-        else if (nombre.contains("nafta ")) codigoFactor = "NAFTA";
-        else if (nombre.contains("diesel")) codigoFactor = "AUTO_DIESEL";
-        else if (nombre.contains("gasolina")) codigoFactor = "AUTO_PETROL";
-        else codigoFactor = "";
-
-        FactorEmision factor = (FactorEmision) factorEmisionRepository.findByCodigoIgnoreCase(codigoFactor)
+        FactorEmision factor = factorEmisionRepository.findByCodigoIgnoreCase(codigoFactor)
                 .orElseThrow(() -> new RuntimeException("Factor no encontrado: " + codigoFactor));
 
+        // Recalcula emisiones
+        float totalKm =
+                (autobus.getAutobusKm() != null ? autobus.getAutobusKm() : 0f) +
+                        (autobus.getAutocarKm() != null ? autobus.getAutocarKm() : 0f) +
+                        (autobus.getTaxiKm() != null ? autobus.getTaxiKm() : 0f) +
+                        (autobus.getMetroKm() != null ? autobus.getMetroKm() : 0f) +
+                        (autobus.getTranviaKm() != null ? autobus.getTranviaKm() : 0f) +
+                        (autobus.getTrenNacionalKm() != null ? autobus.getTrenNacionalKm() : 0f);
+
+        float emisiones = factor.getFactorKgCO2PorUnidad() * totalKm;
+
         autobus.setFactor(factor);
-        autobus.setEmisionesKgCO2_A(factor.getFactorKgCO2PorUnidad() * (autobus.getAutobusKm() + autobus.getTaxiKm()
-        + autobus.getAutocarKm() + autobus.getMetroKm() + autobus.getTranviaKm() + autobus.getTrenNacionalKm()));
+        autobus.setEmisionesKgCO2_A(emisiones);
         autobus.setFechaRegistro(LocalDateTime.now());
 
-        SautobusRepository.save(autobus);
+        sautobusRepository.save(autobus);
 
+        // Mapear a DTO
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(autobus, SAutobusDTO.class);
     }
@@ -176,12 +182,12 @@ public class SAutobusService {
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        return SautobusRepository.sumEmisionesByUsuario(usuario.getIdUsuario());
+        return sautobusRepository.sumEmisionesByUsuario(usuario.getIdUsuario());
     }
 
     public String eliminar(Long id) {
         log.warn("Eliminando transporte público con ID: {}", id);
-        SautobusRepository.deleteById(id);
+        sautobusRepository.deleteById(id);
         return "Registro eliminado";
     }
 }

@@ -14,8 +14,5 @@ import java.util.Date;
 public class SServicioCreateDTO {
     private Float electricidadKWh;
     private Float gasNaturalM3;
-    private Float gasolinaL;
     private Float carbonKl;
-    private Float glpKl;
-    private Float propanoKl;
 }

@@ -27,7 +27,7 @@ public class SAutobusController {
     }
 
     @PostMapping("/registrar")
-    public SAutobusDTO registrarAlimento(@RequestBody SAutobusCreateDTO dto) {
+    public SAutobusDTO registrarAutobus(@RequestBody SAutobusCreateDTO dto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return sAutobusService.Registrar(dto, username);
     }
